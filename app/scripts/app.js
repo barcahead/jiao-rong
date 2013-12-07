@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('jiaoRongApp', [])
+angular.module('jiaoRongApp', ['ngRoute'])
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {

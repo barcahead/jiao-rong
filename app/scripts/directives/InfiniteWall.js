@@ -11,26 +11,19 @@ angular.module('jiaoRongApp')
         var $viewport = iElement;
         var $draggable = iElement.children().first();
         var tilts = scope.tilts;
-        var width = scope.width, height = scope.height, N = 3;
+        var width = scope.width, height = scope.height, N = scope.repeat;
         var cache = {};
     
         
         function create_tile(el, format) {
           var t = format.top, l = format.left;
 
-          if (_.isUndefined(cache[t]))
-            cache[t] = {};
-          
-          if (_.isUndefined(cache[t][l])) {
-            cache[t][l] = true;
+          var $e = $draggable.append('<div><img src="../../images/' + el.n + '"/></div>');
+          var $new_tile = $e.children(":last");
 
-            var $e = $draggable.append('<div><img src="../../images/' + el.n + '"/></div>');
-            var $new_tile = $e.children(":last");
-
-            $new_tile.css(_.extend({
-              position: "absolute",
-            }, format));
-          }
+          $new_tile.css(_.extend({
+            position: "absolute",
+          }, format));
      
         }
               
@@ -43,16 +36,25 @@ angular.module('jiaoRongApp')
             top: -$this.offset().top + $parent.offset().top
           }
 
-          for (var i = 0; i<N; i++) {
-            for (var j =0; j<N; j++) {
-              _.forEach(tilts, function(el) {
-                var format = _.clone(el.format);
-                format.left += j*width;
-                format.top += i*height;
-                if (contain(format, pos)) {
+          var x_lower_bound = (pos.left / width);
+          var x_upper_bound = (pos.left + $viewport.width()) / width;
+          var y_lower_bound = pos.top / height;
+          var y_upper_bound = (pos.top + $viewport.height()) / height;
+
+          for (var i = ~~x_lower_bound; i<=~~x_upper_bound; i++) {
+            for (var j =~~y_lower_bound; j<=~~y_upper_bound; j++) {
+              if (_.isUndefined(cache[i]))
+                cache[i] = {};
+          
+              if (_.isUndefined(cache[i][j])) {
+                cache[i][j] = true;
+                _.forEach(tilts, function(el) {
+                  var format = _.clone(el.format);
+                  format.left += i*width;
+                  format.top += j*height;
                   create_tile(el, format);
-                }
-              });
+                });
+              }
             }
           }
         };
@@ -62,7 +64,7 @@ angular.module('jiaoRongApp')
               vl = pos.left, vt = pos.top, vw = $viewport.width(), vh = $viewport.height();
           if ((tl>=vl&&tl<=vl+vw&&tt>=vt&&tt<=vt+vh) ||
               (tl>=vl&&tl<=vl+vw&&tt+th>=vt&&tt+th<=vt+vh) ||
-              (tl+tw>=vl&&tl+tw<=vl+vw&&tt>=vt&&tt<=vt+vh) ||
+              (tl+tw>=vl&&tl+tw<=vl+vw&&tt>=vt&&tt<=vt+vh) ||Ï
               (tl+tw>=vl&&tl+tw<=vl+vw&&tt+th>=vt&&tt+th<=vt+vh))
             return true;
           return false;
